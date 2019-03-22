@@ -149,7 +149,7 @@ def test_pfs_with_mocked_events(
     assert len(paths2) == 1
     assert paths2[0]['path'] == [addresses[2], addresses[0], addresses[1]]
 
-    # wow close all channels
+    # now we close all channels
     for index, (
         p1_index,
         _p1_deposit,
