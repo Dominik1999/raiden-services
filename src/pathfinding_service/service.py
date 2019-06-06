@@ -1,6 +1,6 @@
 import sys
 from dataclasses import asdict
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 import gevent
 import structlog
@@ -29,24 +29,12 @@ from raiden_libs.events import (
     UpdatedHeadBlockEvent,
 )
 from raiden_libs.gevent_error_handler import register_error_handler
+from raiden_libs.logging import log_event
 from raiden_libs.matrix import MatrixListener
 from raiden_libs.states import BlockchainState
 from raiden_libs.utils import private_key_to_address
 
 log = structlog.get_logger(__name__)
-
-
-def log_event(event: Event) -> Dict[str, Any]:
-    event_data = asdict(event)
-
-    for key, val in event_data.items():
-        if isinstance(val, bytes):
-            if len(val) == 20:
-                event_data[key] = to_checksum_address(val)
-            else:
-                event_data[key] = to_hex(val)
-
-    return event_data
 
 
 class PathfindingService(gevent.Greenlet):
@@ -188,7 +176,7 @@ class PathfindingService(gevent.Greenlet):
         elif isinstance(event, UpdatedHeadBlockEvent):
             self.database.update_lastest_known_block(event.head_block_number)
         else:
-            log.debug("Unhandled event", evt=event)
+            log.debug("Unhandled event", evt=log_event(event))
 
     def handle_token_network_created(self, event: ReceiveTokenNetworkCreatedEvent) -> None:
         network_address = TokenNetworkAddress(event.token_network_address)
@@ -306,7 +294,15 @@ class PathfindingService(gevent.Greenlet):
     def on_pfs_update(self, message: UpdatePFS) -> None:
         token_network = self._validate_pfs_update(message)
 
-        log.info("Received Capacity Update", **asdict(message))
+        log_message = asdict(message)
+        log_message["canonical_identifier"]["token_network_address"] = to_checksum_address(
+            log_message["canonical_identifier"]["token_network_address"]
+        )
+        log_message["other_participant"] = to_checksum_address(log_message["other_participant"])
+        log_message["updating_participant"] = to_checksum_address(
+            log_message["updating_participant"]
+        )
+        log.info("Received Capacity Update", message=log_message)
         self.database.upsert_capacity_update(message)
 
         # Follow presence for the channel participants
