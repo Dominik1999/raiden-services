@@ -48,6 +48,6 @@ MS_DISCLAIMER: str = textwrap.dedent(
             | Matrix server operators.                                           |
             | This implementation follows the technical specification of         |
             | https://raiden-network-specification.readthedocs.io/en/latest/     |
-            | Monitoring Service.                                                |
+            | Monitoring service.                                                |
             ----------------------------------------------------------------------"""
 )
