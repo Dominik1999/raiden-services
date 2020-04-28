@@ -40,3 +40,11 @@ virtualenv -p python3.7 venv
 source venv/bin/activate
 make install-dev
 ```
+
+## Licenses
+
+The code and documentation in this repository are released under the [MIT license](./LICENSE).
+
+This repository contains instructions to install third party software. Those are licensed as follows:
+
+- [Synapse](https://github.com/matrix-org/synapse): [Apache 2.0](https://github.com/matrix-org/synapse/blob/047ac0cbba25ccffb93d92b46254a58f48ddaf9c/LICENSE)
